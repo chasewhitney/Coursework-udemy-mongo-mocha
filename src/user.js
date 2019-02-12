@@ -24,6 +24,15 @@ UserSchema.virtual('postCount').get(function() {
   return this.posts.length;
 })
 
+UserSchema.pre('remove', function(next) {
+  // here, not using require at top to avoid cyclical loading, 2 files requiring each other
+  const BlogPost = mongoose.model('blogPost');
+
+  BlogPost.remove({_id: {$in: this.blogPosts}})
+  .then(() => next());
+})
+
+
 const User = mongoose.model('user', UserSchema);
 
 module.exports = User;
